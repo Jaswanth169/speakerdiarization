@@ -6,14 +6,13 @@ import traceback
 from flask import Flask, request, jsonify, render_template
 from dotenv import load_dotenv
 import azure.cognitiveservices.speech as speechsdk
-from sentence_transformers import SentenceTransformer
 import tempfile
 
 # Load environment variables from .env file
 load_dotenv()
 
 application = Flask(__name__)
-app=application
+app = application
 
 # Diarization and Transcription
 def conversation_transcriber_recognition_canceled_cb(evt: speechsdk.SessionEventArgs):
@@ -34,7 +33,7 @@ def conversation_transcriber_session_started_cb(evt: speechsdk.SessionEventArgs)
     print('SessionStarted event')
 
 def recognize_from_file(audio_file):
-    speech_config = speechsdk.SpeechConfig(subscription=os.environ.get('SPEECH_KEY'), region=os.environ.get('SPEECH_REGION'))
+    speech_config = speechsdk.SpeechConfig(subscription=os.getenv('SPEECH_KEY'), region=os.getenv('SPEECH_REGION'))
     audio_config = speechsdk.audio.AudioConfig(filename=audio_file)
     auto_detect_source_language_config = speechsdk.languageconfig.AutoDetectSourceLanguageConfig(languages=["hi-IN", "te-IN", "kn-IN", "mr-IN"])
     speech_recognizer = speechsdk.SpeechRecognizer(speech_config=speech_config, auto_detect_source_language_config=auto_detect_source_language_config, audio_config=audio_config)
@@ -100,7 +99,9 @@ def translate_text(input_text):
         completion = response.json()
         print(f"Translation Response: {completion}")
         if "choices" in completion and len(completion["choices"]) > 0:
-            return completion["choices"][0]["text"].strip()
+            translated_text = completion["choices"][0]["text"].strip()
+            print(f"Translated Text: {translated_text}")
+            return translated_text
         else:
             print("Unexpected response format or empty response:", completion)
             return None
@@ -109,6 +110,10 @@ def translate_text(input_text):
         if e.response is not None:
             print("Response status code:", e.response.status_code)
             print("Response content:", e.response.text)
+        return None
+    except Exception as e:
+        print(f"Unexpected error in translation: {e}")
+        traceback.print_exc()
         return None
 
 @app.route('/')
@@ -142,4 +147,4 @@ def process_audio():
         return jsonify({'error': 'An unexpected error occurred.'}), 500
 
 if __name__ == "__main__":
-    app.run(debug=True)
+    app.run()

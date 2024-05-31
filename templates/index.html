@@ -69,6 +69,15 @@
             text-align: center;
             display: none;
         }
+        #processed {
+            margin-top: 20px;
+            padding: 10px;
+            border-radius: 5px;
+            text-align: center;
+            display: none;
+            background-color: #007bff;
+            color: #fff;
+        }
         #output {
             margin-top: 20px;
             background-color: #f4f4f9;
@@ -88,7 +97,7 @@
                 <h2>Upload Audio File</h2>
                 <form id="audioForm" action="/process_audio" method="post" enctype="multipart/form-data">
                     <label for="audio_file">Audio File:</label>
-                    <input type="file" id="audio_file" name="audio_file" required>
+                    <input type="file" id="audio_file" name="audio_file" accept=".wav, .mp3" required>
                     <input type="submit" value="Submit">
                 </form>
                 <div id="processing" class="hidden">Processing...</div>
